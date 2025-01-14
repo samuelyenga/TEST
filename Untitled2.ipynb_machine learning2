@@ -1,0 +1,145 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyN/bDT4IwD6kI7eUeoInfSa",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/samuelyenga/TEST/blob/main/Untitled2.ipynb_machine%20learning2\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Importation des bibliothèques nécessaires\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "from sklearn.preprocessing import StandardScaler\n",
+        "from sklearn.cluster import KMeans\n",
+        "from sklearn.metrics import silhouette_score\n",
+        "\n",
+        "# Charger les données\n",
+        "data = pd.read_csv(\n",
+        "    'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data',\n",
+        "    header=None,\n",
+        "    names=['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class']\n",
+        ")\n",
+        "\n",
+        "# Préparation des données\n",
+        "x = data.iloc[:, :-1].values  # Caractéristiques\n",
+        "scaler = StandardScaler()\n",
+        "x_normalized = scaler.fit_transform(x)\n",
+        "\n",
+        "# Modèle non supervisé : KMeans\n",
+        "kmeans_model = KMeans(n_clusters=3, random_state=42)\n",
+        "kmeans_model.fit(x_normalized)  # Entraînement du modèle KMeans\n",
+        "kmeans_labels = kmeans_model.labels_  # Labels des clusters formés\n",
+        "\n",
+        "# Évaluation\n",
+        "silhouette = silhouette_score(x_normalized, kmeans_labels)\n",
+        "print(f'Score Silhouette : {silhouette}')\n",
+        "\n",
+        "# Ajouter les clusters aux données pour analyse\n",
+        "data['Cluster'] = kmeans_labels\n",
+        "print(data[['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'Cluster']].head())\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3ghKnHN2nlr2",
+        "outputId": "fb886eeb-6166-44a0-9226-9c4f5e13fc9a"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Score Silhouette : 0.4787241921049546\n",
+            "   sepal_length  sepal_width  petal_length  petal_width  Cluster\n",
+            "0           5.1          3.5           1.4          0.2        1\n",
+            "1           4.9          3.0           1.4          0.2        2\n",
+            "2           4.7          3.2           1.3          0.2        2\n",
+            "3           4.6          3.1           1.5          0.2        2\n",
+            "4           5.0          3.6           1.4          0.2        1\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 5,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ekNTqM1gVmS9",
+        "outputId": "690fb6a1-4a81-4ca4-db8f-e4fcbd9cdf49"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Précision du modèle : 1.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Importation des bibliothèques nécessaires\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.preprocessing import StandardScaler\n",
+        "from sklearn.ensemble import RandomForestClassifier\n",
+        "from sklearn.metrics import accuracy_score\n",
+        "\n",
+        "# Charger les données\n",
+        "data = pd.read_csv(\n",
+        "    'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data',\n",
+        "    header=None,\n",
+        "    names=['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class']\n",
+        ")\n",
+        "\n",
+        "# Préparation des données\n",
+        "x = data.iloc[:, :-1].values  # Caractéristiques\n",
+        "y = data.iloc[:, -1].values   # Classes\n",
+        "scaler = StandardScaler()\n",
+        "x_normalized = scaler.fit_transform(x)\n",
+        "\n",
+        "# Division des données\n",
+        "x_train, x_test, y_train, y_test = train_test_split(\n",
+        "    x_normalized, y, test_size=0.3, random_state=42\n",
+        ")\n",
+        "\n",
+        "# Modèle supervisé : Random Forest\n",
+        "rf_model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)\n",
+        "rf_model.fit(x_train, y_train)  # Entraînement\n",
+        "y_pred = rf_model.predict(x_test)  # Prédictions sur l'ensemble de test\n",
+        "\n",
+        "# Évaluation\n",
+        "accuracy = accuracy_score(y_test, y_pred)\n",
+        "print(f'Précision du modèle : {accuracy}')\n"
+      ]
+    }
+  ]
+}
